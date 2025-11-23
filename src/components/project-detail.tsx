@@ -303,6 +303,7 @@ export function ProjectDetail({ projectId, onBack, onCreateEpisode, onEditEpisod
         <AICharacterCreationModal
           projectId={projectId}
           project={project}
+          existingCharacters={characters}
           onClose={() => setShowAICharacterModal(false)}
           onCreated={handleCharacterSaved}
         />
@@ -330,11 +331,13 @@ export function ProjectDetail({ projectId, onBack, onCreateEpisode, onEditEpisod
 function AICharacterCreationModal({
   projectId,
   project,
+  existingCharacters,
   onClose,
   onCreated,
 }: {
   projectId: string;
   project: Project;
+  existingCharacters: Character[];
   onClose: () => void;
   onCreated: () => void;
 }) {
@@ -377,7 +380,7 @@ function AICharacterCreationModal({
         project ? {
           artStyle: project.artStyle,
           description: project.description,
-          existingCharacters: characters.map(c => ({
+          existingCharacters: existingCharacters.map(c => ({
             name: c.name,
             description: c.description,
             personality: c.personality,
