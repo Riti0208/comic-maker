@@ -7,7 +7,7 @@ import { ClientGeminiAPI } from '@/lib/client-gemini';
 import { ComicDisplay } from './comic-display';
 import { Notification, ConfirmDialog } from './notification';
 import { ImageModal } from './image-modal';
-import { Sparkles, Image as ImageIcon, BookOpen, ArrowLeft } from 'lucide-react';
+import { Sparkles, Image as ImageIcon, BookOpen, ArrowLeft, AlertTriangle } from 'lucide-react';
 
 interface EpisodeCreatorProps {
   projectId: string;
@@ -698,7 +698,7 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
                         />
                       </label>
                     </div>
-                    {projectCharacters.length > 0 && (
+                    {projectCharacters.filter(pc => pc.imagePreviewUrl).length > 0 && (
                       <div>
                         <select
                           onChange={(e) => {
@@ -709,7 +709,7 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
                           className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-900"
                         >
                           <option value="">既存キャラクターから割り当て</option>
-                          {projectCharacters.map(pc => (
+                          {projectCharacters.filter(pc => pc.imagePreviewUrl).map(pc => (
                             <option key={pc.id} value={pc.id}>{pc.name}</option>
                           ))}
                         </select>
@@ -1007,12 +1007,22 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
                         </div>
                       )}
                       <div className="flex-1 text-left">
-                        <p className="font-medium text-gray-900 dark:text-white">
-                          {char.name}
-                        </p>
+                        <div className="flex items-center gap-1">
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {char.name}
+                          </p>
+                          {!char.imagePreviewUrl && (
+                            <AlertTriangle className="w-4 h-4 text-amber-500" title="画像未設定" />
+                          )}
+                        </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                           {char.description}
                         </p>
+                        {!char.imagePreviewUrl && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                            ※ コミック生成前に画像が必要です
+                          </p>
+                        )}
                       </div>
                     </button>
                   );
