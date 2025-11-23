@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { ComicGenerator } from '@/components/comic-generator';
 import { ProjectList } from '@/components/project-list';
 import { ProjectCreateModal } from '@/components/project-create-modal';
 import { ProjectDetail } from '@/components/project-detail';
@@ -12,8 +11,7 @@ type View =
   | { type: 'projects' }
   | { type: 'project-detail'; projectId: string }
   | { type: 'episode-create'; projectId: string }
-  | { type: 'episode-edit'; projectId: string; episodeId: string }
-  | { type: 'standalone-comic' };
+  | { type: 'episode-edit'; projectId: string; episodeId: string };
 
 export default function Home() {
   const [view, setView] = useState<View>({ type: 'projects' });
