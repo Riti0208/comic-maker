@@ -235,7 +235,7 @@ ${description}
   /** キャラクター参考画像を生成（表情集付き） */
   async generateCharacterImage(
     character: { name: string, description: string },
-    projectInfo?: { artStyle: string, description?: string },
+    projectInfo?: { artStyle: string, description?: string, existingCharacters?: Array<{ name: string, description: string, personality?: string, firstPerson?: string }> },
     referenceImages: string[] = []
   ): Promise<string> {
     const apiKey = await this.getAPIKey();
@@ -255,6 +255,18 @@ ${description}
     const artStyleGuide = projectInfo?.artStyle ? styleInstructions[projectInfo.artStyle] || '' : '';
     const projectContext = projectInfo?.description ? `\n作品の世界観: ${projectInfo.description}` : '';
 
+    // 既存キャラクター情報を整形
+    const existingCharsInfo = projectInfo?.existingCharacters && projectInfo.existingCharacters.length > 0
+      ? '\n\n【このプロジェクトの既存キャラクター】\n' +
+        projectInfo.existingCharacters.map(c => {
+          const parts = [`- ${c.name}: ${c.description}`];
+          if (c.personality) parts.push(`性格: ${c.personality}`);
+          if (c.firstPerson) parts.push(`一人称: ${c.firstPerson}`);
+          return parts.join('、');
+        }).join('\n') +
+        '\n※ 新キャラクターの説明に既存キャラ名が含まれる場合（例：「〇〇のパパ」「〇〇の妹」）、上記の情報を参考にしてデザインしてください。'
+      : '';
+
     const prompt = `🔴🔴🔴 超重要指示：必ず最初の参考画像のレイアウトを完全にコピーしてください 🔴🔴🔴
 
 最初に提供した画像は、キャラクターシートの「絶対に守るべきレイアウトテンプレート」です。
@@ -271,9 +283,9 @@ ${description}
    - 右下：驚き顔
 
 【アートスタイル】
-${artStyleGuide || '汎用的なイラストスタイル'}${projectContext}
+${artStyleGuide || '汎用的なイラストスタイル'}${projectContext}${existingCharsInfo}
 
-【キャラクター情報】
+【新しく作成するキャラクター】
 名前: ${character.name}
 外見: ${character.description}
 

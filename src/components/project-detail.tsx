@@ -374,7 +374,16 @@ function AICharacterCreationModal({
       // Step 2: Generate character image
       const imageUrl = await client.generateCharacterImage(
         { name, description: appearance },
-        project ? { artStyle: project.artStyle, description: project.description } : undefined
+        project ? {
+          artStyle: project.artStyle,
+          description: project.description,
+          existingCharacters: characters.map(c => ({
+            name: c.name,
+            description: c.description,
+            personality: c.personality,
+            firstPerson: c.firstPerson
+          }))
+        } : undefined
       );
 
       // Step 3: Save character to DB
@@ -526,7 +535,16 @@ function CharacterFormModal({
           name: name.trim(),
           description: description.trim()
         },
-        project ? { artStyle: project.artStyle, description: project.description } : undefined
+        project ? {
+          artStyle: project.artStyle,
+          description: project.description,
+          existingCharacters: projectCharacters.map(c => ({
+            name: c.name,
+            description: c.description,
+            personality: c.personality,
+            firstPerson: c.firstPerson
+          }))
+        } : undefined
       );
       setImagePreview(imageUrl);
     } catch (error) {

@@ -190,7 +190,16 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
       const client = new ClientGeminiAPI();
       const imageUrl = await client.generateCharacterImage(
         char,
-        project ? { artStyle: project.artStyle, description: project.description } : undefined
+        project ? {
+          artStyle: project.artStyle,
+          description: project.description,
+          existingCharacters: projectCharacters.map(c => ({
+            name: c.name,
+            description: c.description,
+            personality: c.personality,
+            firstPerson: c.firstPerson
+          }))
+        } : undefined
       );
 
       const newChars = [...episodeCharacters];
