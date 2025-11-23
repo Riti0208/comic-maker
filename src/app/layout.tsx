@@ -24,6 +24,28 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
     apple: '/favicon.ico',
   },
+  openGraph: {
+    type: 'website',
+    locale: 'ja_JP',
+    url: 'https://comic-maker-three.vercel.app',
+    title: '4コマメイカー',
+    description: 'AIで4コマ漫画を簡単に作成できるツール',
+    siteName: '4コマメイカー',
+    images: [
+      {
+        url: '/ogp.jpg',
+        width: 1200,
+        height: 630,
+        alt: '4コマメイカー - AIで4コマ漫画を簡単作成',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: '4コマメイカー',
+    description: 'AIで4コマ漫画を簡単に作成できるツール',
+    images: ['/ogp.jpg'],
+  },
 };
 
 export default function RootLayout({
