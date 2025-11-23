@@ -233,11 +233,27 @@ ${description}
   }
 
   /** キャラクター参考画像を生成（表情集付き） */
-  async generateCharacterImage(character: { name: string, description: string }, referenceImages: string[] = []): Promise<string> {
+  async generateCharacterImage(
+    character: { name: string, description: string },
+    projectInfo?: { artStyle: string, description?: string },
+    referenceImages: string[] = []
+  ): Promise<string> {
     const apiKey = await this.getAPIKey();
     const modelName = await this.getImageModel();
     const genAI = new GoogleGenerativeAI(apiKey);
     const imageModel = genAI.getGenerativeModel({ model: modelName });
+
+    // アートスタイルに応じた具体的な指示
+    const styleInstructions: { [key: string]: string } = {
+      '日本の漫画': 'アニメ/漫画スタイル。大きな瞳、細い線画、はっきりとした輪郭線。髪の毛は束感を意識した表現。',
+      'アメコミ': 'アメコミスタイル。力強い線、筋肉の強調、影の強いコントラスト。ダイナミックなポーズ。',
+      'ウェブトゥーン': '韓国ウェブトゥーンスタイル。やわらかい線、現代的でリアル寄りの顔立ち、自然な髪の流れ。',
+      'ちびキャラ': 'SDキャラ/ちびキャラスタイル。2〜3頭身、大きな頭、丸みを帯びた体型、可愛らしいデフォルメ。',
+      'ノワール/ダーク': 'ノワール/ダークスタイル。暗めのトーン、影を強調、シャープな線、大人っぽい雰囲気。'
+    };
+
+    const artStyleGuide = projectInfo?.artStyle ? styleInstructions[projectInfo.artStyle] || '' : '';
+    const projectContext = projectInfo?.description ? `\n作品の世界観: ${projectInfo.description}` : '';
 
     const prompt = `"${character.name}"という名前のキャラクターの参考シートを作成してください。
 
@@ -248,6 +264,9 @@ ${description}
 - 左側：全身正面図の配置
 - 中央：全身背面図の配置
 - 右側：表情シート（2x2グリッド）の配置とサイズ
+
+【アートスタイル】
+${artStyleGuide || '汎用的なイラストスタイル'}${projectContext}
 
 キャラクターの外見: ${character.description}
 
@@ -262,6 +281,7 @@ ${description}
   * 右下: 驚き顔
 - 中立的な背景
 - 参考画像のレイアウト構造を厳密に守ること
+- 指定されたアートスタイルを忠実に再現すること
 
 キャラクターの説明文は画像に含めないでください。上部にキャラクター名のみを表示してください。`;
 

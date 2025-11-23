@@ -368,7 +368,10 @@ function AICharacterCreationModal({
       const { name, appearance, firstPerson, personality } = data;
 
       // Step 2: Generate character image
-      const imageUrl = await client.generateCharacterImage({ name, description: appearance });
+      const imageUrl = await client.generateCharacterImage(
+        { name, description: appearance },
+        project ? { artStyle: project.artStyle, description: project.description } : undefined
+      );
 
       // Step 3: Save character to DB
       const characterData: Character = {
@@ -512,10 +515,13 @@ function CharacterFormModal({
     setGenerating(true);
     try {
       const client = new ClientGeminiAPI();
-      const imageUrl = await client.generateCharacterImage({
-        name: name.trim(),
-        description: description.trim()
-      });
+      const imageUrl = await client.generateCharacterImage(
+        {
+          name: name.trim(),
+          description: description.trim()
+        },
+        project ? { artStyle: project.artStyle, description: project.description } : undefined
+      );
       setImagePreview(imageUrl);
     } catch (error) {
       console.error('Failed to generate character image:', error);

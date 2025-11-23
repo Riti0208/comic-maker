@@ -188,7 +188,10 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
 
     try {
       const client = new ClientGeminiAPI();
-      const imageUrl = await client.generateCharacterImage(char);
+      const imageUrl = await client.generateCharacterImage(
+        char,
+        project ? { artStyle: project.artStyle, description: project.description } : undefined
+      );
 
       const newChars = [...episodeCharacters];
       newChars[charIndex] = { ...char, imagePreviewUrl: imageUrl };
