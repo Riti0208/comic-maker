@@ -16,10 +16,7 @@ export const metadata: Metadata = {
   title: "4コマメイカー",
   description: "AIで4コマ漫画を簡単に作成できるツール",
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: '/favicon.png', type: 'image/png' },
-    ],
+    icon: '/favicon.ico',
   },
 };
 
