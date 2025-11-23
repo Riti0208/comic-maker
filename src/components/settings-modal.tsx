@@ -72,11 +72,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
     return (
       <div
         className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) {
-            onClose();
-          }
-        }}
       >
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full p-8">
           <p className="text-center text-gray-600 dark:text-gray-400">読み込み中...</p>
@@ -96,11 +91,6 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
       )}
       <div
         className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4"
-        onClick={(e) => {
-          if (e.target === e.currentTarget && !saving) {
-            onClose();
-          }
-        }}
       >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
