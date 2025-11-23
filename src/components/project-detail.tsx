@@ -299,18 +299,20 @@ export function ProjectDetail({ projectId, onBack, onCreateEpisode, onEditEpisod
       </section>
 
       {/* AI Character Creation Modal */}
-      {showAICharacterModal && (
+      {showAICharacterModal && project && (
         <AICharacterCreationModal
           projectId={projectId}
+          project={project}
           onClose={() => setShowAICharacterModal(false)}
           onCreated={handleCharacterSaved}
         />
       )}
 
       {/* Character Form Modal */}
-      {showCharacterForm && (
+      {showCharacterForm && project && (
         <CharacterFormModal
           projectId={projectId}
+          project={project}
           character={editingCharacter}
           projectCharacters={characters}
           onClose={() => {
@@ -327,10 +329,12 @@ export function ProjectDetail({ projectId, onBack, onCreateEpisode, onEditEpisod
 // AI Character Creation Modal
 function AICharacterCreationModal({
   projectId,
+  project,
   onClose,
   onCreated,
 }: {
   projectId: string;
+  project: Project;
   onClose: () => void;
   onCreated: () => void;
 }) {
@@ -469,12 +473,14 @@ function AICharacterCreationModal({
 // Character form modal (create or edit)
 function CharacterFormModal({
   projectId,
+  project,
   character,
   projectCharacters,
   onClose,
   onSaved
 }: {
   projectId: string;
+  project: Project;
   character: Character | null;
   projectCharacters: Character[];
   onClose: () => void;
