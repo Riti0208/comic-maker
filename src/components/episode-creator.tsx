@@ -749,19 +749,46 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
     );
   };
 
-  const handleDownloadComic = () => {
+  const handleDownloadComic = async () => {
     if (!comicImage) return;
 
     try {
-      // Create a download link element
+      // base64データURLをBlobに変換
+      const response = await fetch(comicImage);
+      const blob = await response.blob();
+
+      // File System Access API（新しいブラウザ）をサポートしている場合
+      if ('showSaveFilePicker' in window) {
+        try {
+          const handle = await (window as any).showSaveFilePicker({
+            suggestedName: `${title || 'comic'}.png`,
+            types: [{
+              description: 'PNG画像',
+              accept: { 'image/png': ['.png'] },
+            }],
+          });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          setNotification({ type: 'success', message: 'ダウンロードしました' });
+          return;
+        } catch (e) {
+          // ユーザーがキャンセルした場合は何もしない
+          if ((e as Error).name === 'AbortError') {
+            return;
+          }
+          throw e;
+        }
+      }
+
+      // フォールバック: 従来の方法（Safari等）
       const link = document.createElement('a');
       link.href = comicImage;
       link.download = `${title || 'comic'}.png`;
-
-      // Trigger download
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      setNotification({ type: 'success', message: 'ダウンロードしました' });
     } catch (error) {
       console.error('Download failed:', error);
       setNotification({ type: 'error', message: 'ダウンロードに失敗しました' });
