@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ProjectList } from '@/components/project-list';
 import { ProjectCreateModal } from '@/components/project-create-modal';
 import { ProjectDetail } from '@/components/project-detail';
 import { EpisodeCreator } from '@/components/episode-creator';
 import { SettingsModal } from '@/components/settings-modal';
+import { WelcomeModal } from '@/components/welcome-modal';
+import { db } from '@/lib/db';
 
 type View =
   | { type: 'projects' }
@@ -17,6 +19,19 @@ export default function Home() {
   const [view, setView] = useState<View>({ type: 'projects' });
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+
+  // 初回アクセス時にAPIキーチェック
+  useEffect(() => {
+    const checkAPIKey = async () => {
+      await db.init();
+      const apiKey = await db.getSetting('gemini_api_key');
+      if (!apiKey) {
+        setShowWelcome(true);
+      }
+    };
+    checkAPIKey();
+  }, []);
 
   const handleSelectProject = (projectId: string) => {
     setView({ type: 'project-detail', projectId });
@@ -95,6 +110,12 @@ export default function Home() {
       {showSettings && (
         <SettingsModal
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showWelcome && (
+        <WelcomeModal
+          onClose={() => setShowWelcome(false)}
         />
       )}
     </main>
