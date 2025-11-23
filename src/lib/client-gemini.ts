@@ -410,7 +410,7 @@ ${panelsDesc}
         imageConfig: {
           aspectRatio: '9:16',
         }
-      }
+      } as any
     });
 
     const response = await result.response;
@@ -482,7 +482,7 @@ ${editInstructions}
         imageConfig: {
           aspectRatio: '9:16',
         }
-      }
+      } as any
     });
 
     const response = await result.response;
