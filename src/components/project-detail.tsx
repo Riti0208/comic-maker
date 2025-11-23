@@ -396,11 +396,6 @@ function AICharacterCreationModal({
   return (
     <div
       className="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center z-50 p-4 overflow-y-auto"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !generating) {
-          onClose();
-        }
-      }}
     >
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-lg w-full p-6 my-8">
         <div className="flex items-center justify-between mb-4">
