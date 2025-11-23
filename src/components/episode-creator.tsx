@@ -1012,7 +1012,7 @@ export function EpisodeCreator({ projectId, episodeId, onBack }: EpisodeCreatorP
                             {char.name}
                           </p>
                           {!char.imagePreviewUrl && (
-                            <AlertTriangle className="w-4 h-4 text-amber-500" title="画像未設定" />
+                            <AlertTriangle className="w-4 h-4 text-amber-500" />
                           )}
                         </div>
                         <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
