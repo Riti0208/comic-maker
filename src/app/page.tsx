@@ -85,12 +85,6 @@ export default function Home() {
         />
       )}
 
-      {view.type === 'standalone-comic' && (
-        <div className="py-12">
-          <ComicGenerator />
-        </div>
-      )}
-
       {showCreateModal && (
         <ProjectCreateModal
           onClose={() => setShowCreateModal(false)}
