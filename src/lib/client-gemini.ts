@@ -241,25 +241,57 @@ ${description}
 
     const prompt = `"${character.name}"という名前のキャラクターの参考シートを作成してください。
 
+【重要：参考画像について】
+最初に提供される画像は、キャラクターシートのレイアウト見本です。
+このレイアウトを完全に再現してください：
+- 上部：キャラクター名の配置と枠のスタイル
+- 左側：全身正面図の配置
+- 中央：全身背面図の配置
+- 右側：表情シート（2x2グリッド）の配置とサイズ
+
 キャラクターの外見: ${character.description}
 
 レイアウト要件:
-- 上部: キャラクター名「${character.name}」を明確に表示
-- 左下: 全身の正面図
-- 中央下: 全身の背面図
-- 右下: 表情シート（2x2グリッド）
+- 上部: キャラクター名「${character.name}」を参考画像と同じ位置・スタイルで表示
+- 左側: 全身の正面図（参考画像と同じ配置）
+- 中央: 全身の背面図（参考画像と同じ配置）
+- 右側: 表情シート（2x2グリッド、参考画像と同じサイズ）
   * 左上: 笑顔
   * 右上: 泣き顔
   * 左下: 怒り顔
   * 右下: 驚き顔
 - 中立的な背景
-- プロフェッショナルなキャラクターデザインシートスタイル
+- 参考画像のレイアウト構造を厳密に守ること
 
-キャラクターの説明文は画像に含めないでください。上部にキャラクター名のみを表示してください。
-参考画像が提供されている場合は、同じレイアウトとスタイルに従ってください。`;
+キャラクターの説明文は画像に含めないでください。上部にキャラクター名のみを表示してください。`;
 
-    const parts: any[] = [{ text: prompt }];
+    const parts: any[] = [];
 
+    // キャラクターリファレンス画像を追加（public/character-reference.jpg）
+    try {
+      const referenceResponse = await fetch('/character-reference.jpg');
+      if (referenceResponse.ok) {
+        const blob = await referenceResponse.blob();
+        const arrayBuffer = await blob.arrayBuffer();
+        const base64Data = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        const mimeType = blob.type || 'image/jpeg';
+
+        parts.push({
+          inlineData: {
+            mimeType: mimeType,
+            data: base64Data
+          }
+        });
+      }
+    } catch (e) {
+      console.error('❌ character-reference.jpg読み込み失敗:', e);
+      // リファレンス画像の読み込みに失敗してもキャラクター生成は続行
+    }
+
+    // プロンプトを追加
+    parts.push({ text: prompt });
+
+    // 追加のリファレンス画像があれば追加
     referenceImages.forEach(img => {
       if (img.startsWith('data:image')) {
         const base64Data = img.split(',')[1];
