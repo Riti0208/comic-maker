@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "4コマ コミックメイカー",
+  title: "4コマメイカー",
   description: "AIで4コマ漫画を簡単に作成できるツール",
   icons: {
     icon: '/favicon.png',

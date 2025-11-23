@@ -87,7 +87,7 @@ export function WelcomeModal({ onClose }: WelcomeModalProps) {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            4コマ コミックメイカー
+            4コマメイカー
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             AIで4コマ漫画を簡単に作成
