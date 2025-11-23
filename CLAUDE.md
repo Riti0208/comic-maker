@@ -4,7 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 16 (App Router) application called "Nano Banana Comic Maker" that generates 4-panel manga-style comics using Google's Gemini 3 Pro models. The app uses a multi-step workflow where users input a topic, review/edit the generated plot, design character reference images, and finally generate a complete comic strip.
+This is a Next.js 16 (App Router) application called "4コマメイカー" (4-Koma Maker) that generates 4-panel manga-style comics using Google's Gemini 3 Pro models.
+
+**Architecture**: Fully client-side application
+- All data stored in browser's IndexedDB (no backend server)
+- Direct communication with Google Gemini API from browser
+- Users provide their own Gemini API key
+- Complete privacy: no data sent to any server except Gemini API
+
+The app manages Projects, Characters, and Episodes with a hierarchical structure.
 
 ## Development Commands
 
@@ -24,66 +32,55 @@ npm run lint
 
 ## Environment Setup
 
-Create a `.env.local` file (use `.env.example` as template):
-```
-NANO_BANANA_API_KEY=your_gemini_api_key_here
-```
+No environment variables required! The app runs entirely in the browser.
 
-The app uses Google Generative AI API (Gemini models), which requires a valid API key.
+Users configure their own Google Gemini API key through the settings UI, which is stored in their browser's IndexedDB.
 
 ## Application Architecture
 
-### Multi-Step Comic Generation Flow
+### Data Hierarchy
 
-The app follows a 4-step user journey managed entirely in `src/components/comic-generator.tsx`:
-
-1. **Step 1: Topic & Style** - User inputs comic topic/idea and selects art style
-2. **Step 2: Review Plot** - AI generates title, 4 panels, and character definitions; user can edit
-3. **Step 3: Design Characters** - User generates and refines character reference images
-4. **Step 4: Final Comic** - AI generates the complete 4-panel comic strip
+```
+Project (プロジェクト)
+├── Characters (キャラクター)
+│   ├── Character images
+│   ├── Personality traits
+│   └── First-person pronouns
+└── Episodes (エピソード)
+    ├── Title
+    ├── 4-panel story
+    └── Generated comic image
+```
 
 ### Key Components
 
-- `src/components/comic-generator.tsx` - Main orchestrator managing all 4 steps and state
-- `src/components/character-form.tsx` - Character creation/editing form
-- `src/components/comic-display.tsx` - Displays generated comic panels
-- `src/app/page.tsx` - Simple wrapper rendering ComicGenerator
+- `src/app/page.tsx` - Main app with view router (project list, project detail, episode creator)
+- `src/components/project-detail.tsx` - Project management, character list, episode list
+- `src/components/episode-creator.tsx` - 4-step episode creation workflow
+- `src/components/project-create-modal.tsx` - New project creation
+- `src/components/settings-modal.tsx` - API key and model configuration
+- `src/components/welcome-modal.tsx` - First-time user onboarding
 
-### API Route Structure
+### Core Libraries
 
-Single API endpoint at `src/app/api/generate/route.ts` handles three request types:
+**`src/lib/db.ts`** - IndexedDB wrapper for client-side storage:
+- Projects, Characters, Episodes, Settings
+- All CRUD operations
+- Browser-only, no server communication
 
-**Story Generation** (`type: 'story'`)
-- Input: `{ topic, styleReference }`
-- Uses: `gemini-3-pro-preview` (text model)
-- Output: `{ title, panels[], characterDefinitions[] }`
-
-**Character Reference** (`type: 'character'`)
-- Input: `{ character: { name, description } }`
-- Uses: `gemini-3-pro-image-preview` (image model)
-- Output: `{ imageUrl }` (base64 data URL)
-
-**Final Comic** (`type: 'comic'`)
-- Input: `{ topic, title, panels[], characters[] }`
-- Uses: `gemini-3-pro-image-preview` (image model)
-- Includes: Base layout reference (`public/reference.jpg`) + character images
-- Output: `{ panels: [{ imageUrl }] }` (single 4-panel vertical strip)
-
-### Core Library
-
-`src/lib/nano-banana-client.ts` - Wrapper around Google Generative AI SDK:
-
-- `generateStory()` - Text generation for plot/characters (outputs JSON)
-- `generateCharacterReference()` - Single character image generation
-- `generateFullComic()` - Final multi-panel comic with reference images
-- `generateComicPanel()` - Helper for single panel generation
+**`src/lib/client-gemini.ts`** - Google Gemini API client:
+- `generateEpisodeStory()` - Text generation for story/characters (JSON output)
+- `generateCharacterImage()` - Character reference image generation
+- `generateComic()` - Final 4-panel comic generation with layout reference
+- `generateAICharacter()` - AI-powered character creation
+- Direct browser-to-Gemini API communication
 
 ### Type Definitions
 
 `src/types/index.ts`:
-- `Character` - Character data with id, name, description, imagePreviewUrl
-- `ComicPanel` - Panel data with id, imageUrl, prompt
-- `GenerationRequest` - Request shape for comic generation
+- `Project` - Project with name, description, artStyle
+- `Character` - Character with name, description, imagePreviewUrl, personality, firstPerson
+- `Episode` - Episode with title, panels (4 strings), comicImageUrl, episodeNumber
 
 ## Important Implementation Details
 
@@ -93,7 +90,7 @@ The final comic generation uses a multi-image input approach:
 1. **Base layout**: `public/reference.jpg` provides the 4-panel vertical structure template
 2. **Character references**: Generated character images ensure visual consistency
 
-Both are sent as base64 inline data to the Gemini image model in `generateFullComic()`.
+Both are sent as base64 inline data to the Gemini image model. The reference.jpg is fetched client-side in `client-gemini.ts`.
 
 ### Gemini Model Configuration
 
@@ -104,17 +101,24 @@ Both are sent as base64 inline data to the Gemini image model in `generateFullCo
 
 ### State Management
 
-`comic-generator.tsx` uses local useState for:
-- `currentStep` (1-4)
-- `topic`, `title`, `panels[]` - Story content
-- `selectedStyle` - Art style choice
-- `characters[]` - Character definitions with images (dynamic count based on story)
-- `comicImage` - Final generated comic
-- `isGenerating` - Loading state
+`episode-creator.tsx` uses local useState for 4-step workflow:
+- Step 1: Topic input and character selection
+- Step 2: Story review and editing (title, 4 panels, characters)
+- Step 3: Character image generation/upload
+- Step 4: Final comic generation and episode save
 
-### File Reading in API Route
+`page.tsx` manages view routing between:
+- Project list view
+- Project detail view (with character/episode management)
+- Episode creator view
 
-The API route uses Node.js `fs` module to read `public/reference.jpg` server-side and convert to base64. This is a server-side operation only (src/app/api/generate/route.ts:52-64).
+### IndexedDB Schema
+
+Database: `ComicMakerDB` (version 1)
+- `projects` store: Project data
+- `characters` store: Character data with projectId index
+- `episodes` store: Episode data with projectId index
+- `settings` store: Key-value pairs (API key, model preferences)
 
 ## Path Alias
 
