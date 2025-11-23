@@ -2,6 +2,14 @@
 
 AIで4コマ漫画を簡単に作成できるWebアプリケーション
 
+## 作成例
+
+<div align="center">
+  <img src="public/example1.png" width="300" alt="Example 1">
+  <img src="public/example2.png" width="300" alt="Example 2">
+  <img src="public/example3.png" width="300" alt="Example 3">
+</div>
+
 ## 機能
 
 - プロジェクト管理
