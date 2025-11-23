@@ -255,40 +255,41 @@ ${description}
     const artStyleGuide = projectInfo?.artStyle ? styleInstructions[projectInfo.artStyle] || '' : '';
     const projectContext = projectInfo?.description ? `\n作品の世界観: ${projectInfo.description}` : '';
 
-    const prompt = `"${character.name}"という名前のキャラクターの参考シートを作成してください。
+    const prompt = `🔴🔴🔴 超重要指示：必ず最初の参考画像のレイアウトを完全にコピーしてください 🔴🔴🔴
 
-【重要：参考画像について】
-最初に提供される画像は、キャラクターシートのレイアウト見本です。
-このレイアウトを完全に再現してください：
-- 上部：キャラクター名の配置と枠のスタイル
-- 左側：全身正面図の配置
-- 中央：全身背面図の配置
-- 右側：表情シート（2x2グリッド）の配置とサイズ
+最初に提供した画像は、キャラクターシートの「絶対に守るべきレイアウトテンプレート」です。
+このレイアウトを1ピクセル単位で完全に再現してください。
+
+【絶対に守るべき構造】
+1. 上部の「NAME」枠 → 「${character.name}」に置き換え（位置・サイズ・枠のスタイルは同じ）
+2. 左側の全身正面図 → サイズと位置を参考画像と完全一致させる
+3. 中央の全身背面図 → サイズと位置を参考画像と完全一致させる
+4. 右側の表情シート（2x2グリッド）→ サイズと位置を参考画像と完全一致させる
+   - 左上：笑顔
+   - 右上：泣き顔
+   - 左下：怒り顔
+   - 右下：驚き顔
 
 【アートスタイル】
 ${artStyleGuide || '汎用的なイラストスタイル'}${projectContext}
 
-キャラクターの外見: ${character.description}
+【キャラクター情報】
+名前: ${character.name}
+外見: ${character.description}
 
-レイアウト要件:
-- 上部: キャラクター名「${character.name}」を参考画像と同じ位置・スタイルで表示
-- 左側: 全身の正面図（参考画像と同じ配置）
-- 中央: 全身の背面図（参考画像と同じ配置）
-- 右側: 表情シート（2x2グリッド、参考画像と同じサイズ）
-  * 左上: 笑顔
-  * 右上: 泣き顔
-  * 左下: 怒り顔
-  * 右下: 驚き顔
-- 中立的な背景
-- 参考画像のレイアウト構造を厳密に守ること
-- 指定されたアートスタイルを忠実に再現すること
+【最終確認事項】
+✓ 参考画像と同じレイアウト構造になっているか？
+✓ 各要素の配置・サイズは参考画像と一致しているか？
+✓ 上部のNAME枠は参考画像と同じスタイルで「${character.name}」になっているか？
+✓ 背景は中立的な色になっているか？
 
-キャラクターの説明文は画像に含めないでください。上部にキャラクター名のみを表示してください。`;
+参考画像のレイアウトを守ることが最優先です。守れない場合は生成しないでください。`;
 
     const parts: any[] = [];
 
     // キャラクターリファレンス画像を追加（public/character-reference.jpg）
     try {
+      console.log('📸 character-reference.jpg読み込み開始');
       const referenceResponse = await fetch('/character-reference.jpg');
       if (referenceResponse.ok) {
         const blob = await referenceResponse.blob();
@@ -302,6 +303,9 @@ ${artStyleGuide || '汎用的なイラストスタイル'}${projectContext}
             data: base64Data
           }
         });
+        console.log('✅ character-reference.jpg追加成功 (mimeType:', mimeType, ', data length:', base64Data.length, ')');
+      } else {
+        console.error('❌ character-reference.jpg取得失敗:', referenceResponse.status);
       }
     } catch (e) {
       console.error('❌ character-reference.jpg読み込み失敗:', e);
